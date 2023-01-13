@@ -373,6 +373,10 @@ void EDepSim::PersistencyManager::MarkTrajectories(const G4Event* event) {
         if (particleName == "nu_mu") continue;
         if (particleName == "nu_tau") continue;
 
+        // alright let's just save anything that ain't a neutrino
+        ndTraj->MarkTrajectory(false);
+        continue;
+
 	// Save all pi0s
 	if (particleName == "pi0"){
 	  ndTraj->MarkTrajectory(false);
@@ -675,7 +679,8 @@ EDepSim::PersistencyManager::SelectTrajectoryPoints(std::vector<int>& selected,
     // trajectory.
     //////////////////////////////////////////////
     EDepSim::Trajectory* ndTraj = dynamic_cast<EDepSim::Trajectory*>(g4Traj);
-    if (ndTraj->GetSDTotalEnergyDeposit() < 1*eV) return;
+    // Actually don't short out those trajectories -MK
+    // if (ndTraj->GetSDTotalEnergyDeposit() < 1*eV) return;
 
     // Find the trajectory points where particles are entering and leaving the
     // detectors.
@@ -723,6 +728,8 @@ EDepSim::PersistencyManager::SelectTrajectoryPoints(std::vector<int>& selected,
     selected.erase(std::unique(selected.begin(), selected.end()),
                    selected.end());
 
+    // We can leave this "return" in place since we've already got the point
+    // we want (i.e. where the track crosses a volume boundary) -MK
     if (ndTraj->GetSDEnergyDeposit() < 1*eV) return;
 
     double desiredAccuracy = GetTrajectoryPointAccuracy();
