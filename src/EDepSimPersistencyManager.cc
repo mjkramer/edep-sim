@@ -374,7 +374,19 @@ void EDepSim::PersistencyManager::MarkTrajectories(const G4Event* event) {
         if (particleName == "nu_tau") continue;
 
         // alright let's just save anything that ain't a neutrino
-        ndTraj->MarkTrajectory(false);
+        // ndTraj->MarkTrajectory(false);
+        //continue;
+
+        // actually we should loop over trajectory points and only mark the
+        // trajectory if it entered the hall
+        for (int i = 0; i < ndTraj->GetPointEntries(); ++i) {
+            EDepSim::TrajectoryPoint* edepPoint
+                = dynamic_cast<EDepSim::TrajectoryPoint*>(ndTraj->GetPoint(i));
+            if (edepPoint->GetPhysVolName() == "volMinosNDHall_PV_0") {
+                ndTraj->MarkTrajectory(false);
+                break;
+            }
+        }
         continue;
 
 	// Save all pi0s
